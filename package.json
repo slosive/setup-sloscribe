@@ -1,0 +1,29 @@
+{
+   "name": "slotalk-installer",
+   "version": "v0.1.0-alpha.2",
+   "main": "lib/index.js",
+   "repository": "git@github.com:tfadeyi/slotalk-installer.git",
+   "author": "Oluwole Fadeyi <oluwolefadeyi@gmail.com>",
+   "license": "MIT",
+   "keywords": [
+      "GitHub",
+      "Actions",
+      "Slotalk"
+   ],
+   "scripts": {
+      "build": "ncc build src/run.ts -o lib",
+      "format": "prettier --write .",
+      "format-check": "prettier --check ."
+   },
+   "dependencies": {
+      "@actions/core": "^1.10.0",
+      "@actions/tool-cache": "2.0.1",
+      "semver": "^6.1.0"
+   },
+   "devDependencies": {
+      "@vercel/ncc": "^0.34.0",
+      "@types/node": "^20.3.1",
+      "prettier": "^2.8.8",
+      "typescript": "^5.1.3"
+   }
+}

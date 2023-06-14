@@ -1,0 +1,18 @@
+# action.yml
+name: slotalk-installer
+author: tfadeyi
+description: 'Installs slotalk and includes it in your path'
+branding:
+   icon: 'package'
+   color: 'blue'
+inputs:
+   version:
+      description: 'Version of slotalk'
+      required: true
+      default: 'latest'
+outputs:
+   slotalk-path:
+      description: 'Path to the cached slotalk binary'
+runs:
+   using: 'node16'
+   main: 'lib/index.js'
