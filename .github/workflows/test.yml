@@ -1,0 +1,45 @@
+name: 'build-test'
+on: # rebuild any PRs and main branch changes
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'releases/*'
+
+jobs:
+  build: # make sure build/ci work properly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          npm install
+      - run: |
+          npm run all
+  test_latest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup slotalk
+        uses: ./
+        with:
+          version: 'latest'
+      - name: Validate
+        run: |
+          slotalk version
+  test_no_version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup slotalk
+        uses: ./
+      - name: Validate
+        run: |
+          slotalk version
+  test_with_version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup slotalk
+        uses: ./
+        with:
+          version: '0.1.0-alpha.1'
+      - name: Validate
+        run: |
+          slotalk version

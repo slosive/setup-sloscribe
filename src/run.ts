@@ -1,7 +1,27 @@
-// Copyright (c) Microsoft Corporation.
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT license.
+/*
+MIT License
 
+Copyright (c) 2023 Oluwole Fadeyi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
 import * as os from 'os'
 import * as path from 'path'
 import * as util from 'util'
@@ -15,14 +35,11 @@ const slotalkToolName = 'slotalk'
 export async function run() {
    let version = core.getInput('version', {required: true})
 
-   if (version !== 'latest' && version[0] !== 'v') {
+   if (version !== 'latest' && version.startsWith("v",0 )) {
       version = getValidVersion(version)
-   } else {
-      version = 'latest'
-      core.info('Getting latest Slotalk version')
    }
 
-   core.startGroup(`Downloading ${version}`)
+   core.startGroup(`Downloading slotalk ${version}`)
    const cachedPath = await downloadSlotalk(version)
    core.endGroup()
 
@@ -75,6 +92,9 @@ export function getSlotalkDownloadURL(version: string): string {
             version
          )
       default:
+         core.warning(
+             `the installer was not able to find a valid slotalk binary for the host github runner os/arch: ${os}/${arch}`
+         )
          return ''
    }
 }
@@ -83,15 +103,12 @@ export async function downloadSlotalk(version: string): Promise<string> {
    let cachedToolpath = toolCache.find(slotalkToolName, version)
    if (!cachedToolpath) {
       let slotalkDownloadPath
+      let downloadURL: string = getSlotalkDownloadURL(version)
       try {
-         slotalkDownloadPath = await toolCache.downloadTool(
-            getSlotalkDownloadURL(version)
-         )
+         slotalkDownloadPath = await toolCache.downloadTool(downloadURL)
       } catch (exception) {
          throw new Error(
-            `Failed to download Slotalk from location ${getSlotalkDownloadURL(
-               version
-            )}`
+            `Failed to download slotalk from location ${downloadURL}`
          )
       }
 
@@ -130,22 +147,22 @@ export function findSlotalk(rootFolder: string): string {
 
 export var walkSync = function (
    dir: string,
-   filelist: string[],
+   fileList: string[],
    fileToFind: string
 ) {
    const files = fs.readdirSync(dir)
-   filelist = filelist || []
+   fileList = fileList || []
    files.forEach(function (file) {
       if (fs.statSync(path.join(dir, file)).isDirectory()) {
-         filelist = walkSync(path.join(dir, file), filelist, fileToFind)
+         fileList = walkSync(path.join(dir, file), fileList, fileToFind)
       } else {
          core.debug(file)
          if (file == fileToFind) {
-            filelist.push(path.join(dir, file))
+            fileList.push(path.join(dir, file))
          }
       }
    })
-   return filelist
+   return fileList
 }
 
 run().catch(core.setFailed)
