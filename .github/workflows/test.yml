@@ -9,37 +9,32 @@ on: # rebuild any PRs and main branch changes
 jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
+    env:
+      PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
     steps:
       - uses: actions/checkout@v3
       - run: |
-          npm install
-      - run: |
-          npm run all
-  test_latest:
-    runs-on: ubuntu-latest
-    steps:
+           echo $PR_BASE_REF
+           if [[ $PR_BASE_REF != releases/* ]]; then
+             npm install
+             npm run build
+           fi
       - name: Setup slotalk
         uses: ./
         with:
           version: 'latest'
-      - name: Validate
+      - name: Validate Lastest
         run: |
           slotalk version
-  test_no_version:
-    runs-on: ubuntu-latest
-    steps:
       - name: Setup slotalk
         uses: ./
-      - name: Validate
+      - name: Validate No Version Input
         run: |
           slotalk version
-  test_with_version:
-    runs-on: ubuntu-latest
-    steps:
       - name: Setup slotalk
         uses: ./
         with:
           version: '0.1.0-alpha.1'
-      - name: Validate
+      - name: Validate With targeted version
         run: |
           slotalk version
