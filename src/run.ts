@@ -35,7 +35,7 @@ const slotalkToolName = 'slotalk'
 export async function run() {
    let version = core.getInput('version', {required: true})
 
-   if (version !== 'latest' && version.startsWith("v",0 )) {
+   if (version !== 'latest' && version[0] !== "v") {
       version = getValidVersion(version)
    }
 
@@ -71,32 +71,32 @@ export function getSlotalkDownloadURL(version: string): string {
 
    switch (true) {
       case operatingSystem == LINUX && arch == ARM64:
-         return util.format(
-            'https://github.com/tfadeyi/slotalk/releases/%s/download/slotalk-linux-arm64.tar.gz',
-            version
-         )
+         return getURL("linux", "arm64", version)
       case operatingSystem == LINUX:
-         return util.format(
-            'https://github.com/tfadeyi/slotalk/releases/%s/download/slotalk-linux-amd64.tar.gz',
-            version
-         )
-
+         return getURL("linux", "amd64", version)
       case operatingSystem == MAC_OS && arch == ARM64:
-         return util.format(
-            'https://github.com/tfadeyi/slotalk/releases/%s/download/slotalk-darwin-arm64.tar.gz',
-            version
-         )
+         return getURL("darwin", "arm64", version)
       case operatingSystem == MAC_OS:
-         return util.format(
-            'https://github.com/tfadeyi/slotalk/releases/%s/download/slotalk-darwin-amd64.tar.gz',
-            version
-         )
+         return getURL("darwin", "amd64", version)
       default:
          core.warning(
              `the installer was not able to find a valid slotalk binary for the host github runner os/arch: ${os}/${arch}`
          )
          return ''
    }
+}
+
+export function getURL(os: string, arch:string, version: string): string {
+   if (version === "latest") {
+      return util.format(
+          'https://github.com/tfadeyi/slotalk/releases/latest/download/slotalk-%s-%s.tar.gz',
+          os, arch
+      )
+   }
+   return util.format(
+       'https://github.com/tfadeyi/slotalk/releases/download/%s/slotalk-%s-%s.tar.gz',
+       version, os, arch
+   )
 }
 
 export async function downloadSlotalk(version: string): Promise<string> {
